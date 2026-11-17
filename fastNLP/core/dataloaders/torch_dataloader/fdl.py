@@ -101,7 +101,11 @@ class TorchDataLoader(DataLoader):
     :param worker_init_fn: init 函数，如果不设置为 ``None``，则将会在每个子进程初始化时调用该函数。
     :param multiprocessing_context: 多进程的上下文环境
     :param generator: 如果其不为 ``None``, 将会使用 RandomSampler 去生成随机的 index 且会为每个子进程生成一个 ``base_seed``
-    :param prefetch_factor: 每个 worker 提前装载的 samples 数量。``2`` 意味着在所有的进程中会有 2*num_workers 的数据被预取。默认值为 ``2`` .
+    :param prefetch_factor: 每个 worker 预先加载的 batch 数量。
+        当 ``num_workers=0`` 时，默认值为 ``None``，不启用多进程预取。
+        当 ``num_workers>0`` 时，默认值 ``None`` 由 PyTorch 自动处理，
+        在 PyTorch 2.0 中默认每个 worker 预取 2 个 batch。
+        用户也可以显式指定正整数作为预取数量。
     :param persistent_workers: 如果其为 ``True``, ``TorchDataLoader`` 在迭代完一次 dataset 后不会关闭所有进程。默认为 ``False``
     """
 
@@ -141,7 +145,6 @@ class TorchDataLoader(DataLoader):
                 raise ValueError(f"collate_fn: {collate_fn} must be 'auto'")
 
         dl_kwargs = _match_param(TorchDataLoader.__init__, DataLoader.__init__, fn_name=DataLoader.__name__)
-
         if dl_kwargs is None:
             super().__init__(dataset=dataset, batch_size=batch_size, shuffle=shuffle, sampler=sampler,
                              batch_sampler=batch_sampler, num_workers=num_workers, collate_fn=collate_fn,
@@ -290,7 +293,12 @@ def prepare_torch_dataloader(ds_or_db,
     :param worker_init_fn: init 函数，如果不设置为 ``None``，则将会在每个子进程初始化时调用该函数。
     :param multiprocessing_context: 多进程的上下文环境
     :param generator: 如果其不为 ``None``, 将会使用 RandomSampler 去生成随机的 index 且会为每个子进程生成一个 ``base_seed``
-    :param prefetch_factor: 每个 worker 提前装载的 samples 数量。``2`` 意味着在所有的进程中会有 2*num_workers 的数据被预取。默认值为 ``2`` .
+    :param prefetch_factor: 每个 worker 预先加载的 batch 数量。
+        当 ``num_workers=0`` 时，默认值为 ``None``，不启用多进程预取。
+        当 ``num_workers>0`` 时，默认值 ``None`` 由 PyTorch 自动处理，
+        在 PyTorch 2.0 中默认每个 worker 预取 2 个 batch。
+        用户也可以显式指定正整数作为预取数量。
+
     :param persistent_workers: 如果其为 ``True``, ``TorchDataLoader`` 在迭代完一次 dataset 后不会关闭所有进程。默认为 ``False``
 
     """
