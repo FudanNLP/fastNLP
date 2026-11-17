@@ -110,7 +110,7 @@ class TorchDataLoader(DataLoader):
                  num_workers: int = 0, collate_fn: Union[Callable, str, None] = 'auto',
                  pin_memory: bool = False, drop_last: bool = False,
                  timeout: float = 0, worker_init_fn: Optional[Callable] = None,
-                 multiprocessing_context=None, generator=None, prefetch_factor: int = 2,
+                 multiprocessing_context=None, generator=None, prefetch_factor: Optional[int] = None,
                  persistent_workers: bool = False, **kwargs) -> None:
 
         if isinstance(dataset, DataSet) and collate_fn is None:
@@ -141,6 +141,7 @@ class TorchDataLoader(DataLoader):
                 raise ValueError(f"collate_fn: {collate_fn} must be 'auto'")
 
         dl_kwargs = _match_param(TorchDataLoader.__init__, DataLoader.__init__, fn_name=DataLoader.__name__)
+
         if dl_kwargs is None:
             super().__init__(dataset=dataset, batch_size=batch_size, shuffle=shuffle, sampler=sampler,
                              batch_sampler=batch_sampler, num_workers=num_workers, collate_fn=collate_fn,
@@ -234,7 +235,7 @@ def prepare_torch_dataloader(ds_or_db,
                              num_workers: int = 0, collate_fn: Union[Callable, str, None] = 'auto',
                              pin_memory: bool = False, drop_last: bool = False,
                              timeout: float = 0, worker_init_fn: Optional[Callable] = None,
-                             multiprocessing_context=None, generator=None, prefetch_factor: int = 2,
+                             multiprocessing_context=None, generator=None, prefetch_factor: Optional[int] = None,
                              persistent_workers: bool = False,
                              non_train_sampler: Union["Sampler[int]", ReproducibleSampler, UnrepeatedSampler] = None,
                              non_train_batch_size: int = None) \
